@@ -357,7 +357,7 @@ include $(BUILD_SYSTEM)/envsetup.mk
 FIND_LEAVES_EXCLUDES := $(addprefix --prune=, $(SCAN_EXCLUDE_DIRS) .repo .git)
 
 ifneq ($(CUSTOM_BUILD),)
-include vendor/aosp/config/BoardConfig.mk
+include vendor/ethereal/config/BoardConfig.mk
 endif
 
 # The build system exposes several variables for where to find the kernel
@@ -1282,6 +1282,6 @@ DEFAULT_DATA_OUT_MODULES := ltp $(ltp_packages) $(kselftest_modules)
 .KATI_READONLY := DEFAULT_DATA_OUT_MODULES
 
 # Include our vendor specific config.mk file
--include vendor/aosp/build/core/config.mk
+-include vendor/ethereal/build/core/config.mk
 
 include $(BUILD_SYSTEM)/dumpvar.mk
