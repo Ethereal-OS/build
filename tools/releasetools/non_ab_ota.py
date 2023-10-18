@@ -231,6 +231,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   build_date = target_info.GetBuildProp("ro.build.date")
   security_patch = target_info.GetBuildProp("ro.build.version.security_patch")
   device = target_info.GetBuildProp("ro.product.device")
+  build_type = target_info.GetBuildProp("org.ethereal.device")
 
   script.Print("-----------------------------------------");
   script.Print(",--. ,---. .  . ,--. ,-.  ,--.  ,.  ,    ");
@@ -241,11 +242,12 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   script.Print("      Your Destiny Brings You Here.      ");
   script.Print("                                         ");
   script.Print("-----------------------------------------");
-  script.Print(" Android version: %s"%(android_version));
-  script.Print(" Build id: %s"%(build_id));
-  script.Print(" Build date: %s"%(build_date));
-  script.Print(" Security patch: %s"%(security_patch));
+  script.Print(" Android Version: %s"%(android_version));
+  script.Print(" Build Id: %s"%(build_id));
+  script.Print(" Build Date: %s"%(build_date));
+  script.Print(" Security Patch: %s"%(security_patch));
   script.Print(" Device: %s"%(device));
+  script.Print(" Ethereal Build Type: %s"%(build_type));
   script.Print("------------------------------------------");                                                      
   device_specific.FullOTA_InstallBegin()
 
