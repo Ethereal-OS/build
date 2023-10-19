@@ -57,6 +57,6 @@ if [ -n "$BUILD_THUMBPRINT" ] ; then
   echo "ro.build.thumbprint=$BUILD_THUMBPRINT"
 fi
 
-echo "ro.ethereal.device=$CUSTOM_DEVICE"
+echo "org.ethereal.device=$CUSTOM_DEVICE"
 
 echo "# end build properties"
