@@ -232,21 +232,21 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   security_patch = target_info.GetBuildProp("ro.build.version.security_patch")
   device = target_info.GetBuildProp("ro.product.device")
 
-  script.Print("-----------------------------------------");
-  script.Print(",--. ,---. .  . ,--. ,-.  ,--.  ,.  ,    ");
-  script.Print("|      |   |  | |    |  ) |    /  \ |    ");
-  script.Print("|-     |   |--| |-   |-<  |-   |--| |    ");
-  script.Print("|      |   |  | |    |  \ |    |  | |    ");
-  script.Print("`--'   '   '  ' `--' '  ' `--' '  ' `--' ");
-  script.Print("      Your Destiny Brings You Here.      ");
-  script.Print("                                         ");
-  script.Print("-----------------------------------------");
+  script.Print("|-----------------------------------------|");
+  script.Print("|,--. ,---. .  . ,--. ,-.  ,--.  ,.  ,    |");
+  script.Print("||      |   |  | |    |  ) |    /  \ |    |");
+  script.Print("||-     |   |--| |-   |-<  |-   |--| |    |");
+  script.Print("||      |   |  | |    |  \ |    |  | |    |");
+  script.Print("|`--'   '   '  ' `--' '  ' `--' '  ' `--' |");
+  script.Print("|      Your Destiny Brings You Here.      |");
+  script.Print("|               BY IamCOD3X               |");
+  script.Print("|-----------------------------------------|");
   script.Print(" Android Version: %s"%(android_version));
   script.Print(" Build Id: %s"%(build_id));
   script.Print(" Build Date: %s"%(build_date));
   script.Print(" Security Patch: %s"%(security_patch));
   script.Print(" Device: %s"%(device));
-  script.Print("------------------------------------------");                                                      
+  script.Print("|------------------------------------------|");                                                      
   device_specific.FullOTA_InstallBegin()
 
   if CopyInstallTools(output_zip):
