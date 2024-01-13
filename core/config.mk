@@ -356,8 +356,8 @@ include $(BUILD_SYSTEM)/envsetup.mk
 # See envsetup.mk for a description of SCAN_EXCLUDE_DIRS
 FIND_LEAVES_EXCLUDES := $(addprefix --prune=, $(SCAN_EXCLUDE_DIRS) .repo .git)
 
-ifneq ($(CUSTOM_BUILD),)
-include vendor/ethereal/config/BoardConfig.mk
+ifneq ($(ETHEREAL_BUILD),)
+include vendor/ethereal/config/BoardConfigEthereal.mk
 endif
 
 # The build system exposes several variables for where to find the kernel
@@ -1259,17 +1259,17 @@ endif
 # in the source tree.
 dont_bother_goals := out product-graph
 
+ifneq ($(ETHEREAL_BUILD),)
+ifneq ($(wildcard device/ethereal/sepolicy/common/sepolicy.mk),)
+## We need to be sure the global selinux policies are included
+## last, to avoid accidental resetting by device configs
+$(eval include device/ethereal/sepolicy/common/sepolicy.mk)
+endif
+endif
+
 # Make ANDROID Soong config variables visible to Android.mk files, for
 # consistency with those defined in BoardConfig.mk files.
 include $(BUILD_SYSTEM)/android_soong_config_vars.mk
-
-ifneq ($(CUSTOM_BUILD),)
-ifneq ($(wildcard device/custom/sepolicy/common/sepolicy.mk),)
-## We need to be sure the global selinux policies are included
-## last, to avoid accidental resetting by device configs
-$(eval include device/custom/sepolicy/common/sepolicy.mk)
-endif
-endif
 
 ifeq ($(CALLED_FROM_SETUP),true)
 include $(BUILD_SYSTEM)/ninja_config.mk

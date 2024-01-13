@@ -46,7 +46,7 @@ Invoke ". build/envsetup.sh" from your shell to add the following functions to y
 
 EOF
 
-    __print_custom_functions_help
+    __print_ethereal_functions_help
 
 cat <<EOF
 
@@ -154,11 +154,11 @@ function check_product()
         return
     fi
     if (echo -n $1 | grep -q -e "^ethereal_") ; then
-        CUSTOM_BUILD=$(echo -n $1 | sed -e 's/^ethereal_//g')
+        ETHEREAL_BUILD=$(echo -n $1 | sed -e 's/^ethereal_//g')
     else
-        CUSTOM_BUILD=
+        ETHEREAL_BUILD=
     fi
-    export CUSTOM_BUILD
+    export ETHEREAL_BUILD
 
         TARGET_PRODUCT=$1 \
         TARGET_BUILD_VARIANT= \
@@ -372,7 +372,6 @@ function set_stuff_for_environment()
     setpaths
     set_sequence_number
 
-    export ANDROID_BUILD_TOP=$(gettop)
     # With this environment variable new GCC can apply colors to warnings/errors
     export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 }
@@ -697,7 +696,7 @@ function print_lunch_menu()
 
     local i=1
     local choice
-    for choice in ${choices[@]}
+    for choice in $(echo $choices)
     do
         echo "     $i. $choice"
         i=$(($i+1))
@@ -710,19 +709,6 @@ function lunch()
 {
     local answer
 
-    choices=()
-    for makefile_target in $(TARGET_BUILD_APPS= TARGET_PRODUCT= TARGET_BUILD_VARIANT= get_build_var COMMON_LUNCH_CHOICES 2>/dev/null)
-    do
-        choices+=($makefile_target)
-    done
-    for other_target in ${lunch_others_targets[@]}
-    do
-        if [[ " ${choices[*]} " != *"$other_target"* ]];
-        then
-            choices+=($other_target)
-        fi
-    done
-
     if [[ $# -gt 1 ]]; then
         echo "usage: lunch [target]" >&2
         return 1
@@ -732,23 +718,11 @@ function lunch()
 
     if [ "$1" ]; then
         answer=$1
-        if (echo -n $answer | grep -q -e "^[0-9][0-9]*$")
-        then
-            echo
-            echo "Invalid lunch combo"
-            return 1
-        fi
     else
         print_lunch_menu
-        echo -n "Which would you like? "
-        echo -n "Pick from common choices above (e.g. 13) or specify your own (e.g. ethereal_barbet-eng): "
+        echo "Which would you like? [aosp_arm-eng]"
+        echo -n "Pick from common choices above (e.g. 13) or specify your own (e.g. aosp_barbet-eng): "
         read answer
-        if ! (echo -n $answer | grep -q -e "^[0-9][0-9]*$")
-        then
-            echo
-            echo "Invalid lunch combo"
-            return 1
-        fi
         used_lunch_menu=1
     fi
 
@@ -756,12 +730,11 @@ function lunch()
 
     if [ -z "$answer" ]
     then
-        echo
-        echo "Invalid lunch combo"
-        return 1
+        selection=aosp_arm-eng
     elif (echo -n $answer | grep -q -e "^[0-9][0-9]*$")
     then
-        if [ $answer -ge 1 ] && [ $answer -le ${#choices[@]} ]
+        local choices=($(TARGET_BUILD_APPS= get_build_var COMMON_LUNCH_CHOICES))
+        if [ $answer -le ${#choices[@]} ]
         then
             # array in zsh starts from 1 instead of 0.
             if [ -n "$ZSH_VERSION" ]
@@ -770,10 +743,6 @@ function lunch()
             else
                 selection=${choices[$(($answer-1))]}
             fi
-        else
-            echo
-            echo "Invalid lunch combo"
-            return 1
         fi
     else
         selection=$answer
@@ -800,7 +769,7 @@ function lunch()
 
     if ! check_product $product
     then
-        # if we can't find a product, try to grab it off the PixelExperience GitHub
+        # if we can't find a product, try to grab it off the Ethereal Devices GitHub
         T=$(gettop)
         cd $T > /dev/null
         vendor/ethereal/build/tools/roomservice.py $product
@@ -827,8 +796,8 @@ function lunch()
         echo "** Don't have a product spec for: '$product'"
         echo "** Do you have the right repo manifest?"
         product=
-        return 1
     fi
+
     if [ -z "$product" -o -z "$variant" ]
     then
         echo
@@ -1153,7 +1122,7 @@ function coredump_enable()
         return;
     fi;
     echo "Setting core limit for $PID to infinite...";
-    adb shell /system/bin/ulimit -p $PID -c unlimited
+    adb shell /system/bin/ulimit -P $PID -c unlimited
 }
 
 # core - send SIGV and pull the core for process
@@ -2048,7 +2017,20 @@ if [ -z ${CCACHE_EXEC} ]; then
             export CCACHE_DIR=${HOME}/.ccache
         fi
         $ccache_path -o compression=true
-        echo -e "\e[1mccache enabled and \e[32m\e[4mCCACHE_EXEC\e[0m \e[1mhas been set to : \e[4m$ccache_path\e[0m"
+        echo -e "ccache enabled and CCACHE_EXEC has been set to : $ccache_path"
+    else
+        echo -e "ccache not found installed!"
+    fi
+fi
+
+# check and set ccache path on envsetup
+if [ -z ${CCACHE_EXEC} ]; then
+    ccache_path=$(which ccache)
+    if [ ! -z "$ccache_path" ]; then
+	export USE_CCACHE=1
+	export CCACHE_COMPRESS=1
+        export CCACHE_EXEC="$ccache_path"
+	echo -e "\e[1mccache enabled and \e[32m\e[4mCCACHE_EXEC\e[0m \e[1mhas been set to : \e[4m$ccache_path\e[0m"
     else
         echo -e "\e[31m\e[1mccache not found/installed!\e[0m"
     fi

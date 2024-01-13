@@ -694,7 +694,7 @@ class BuildInfo(object):
 def ReadFromInputFile(input_file, fn):
   """Reads the contents of fn from input zipfile or directory."""
   if isinstance(input_file, zipfile.ZipFile):
-    return input_file.read(fn).decode()
+    return input_file.read(fn).decode('utf-8', 'ignore')
   else:
     path = os.path.join(input_file, *fn.split("/"))
     try:
@@ -2321,12 +2321,22 @@ def GetMinSdkVersionInt(apk_name, codename_to_api_level_map):
   try:
     return int(version)
   except ValueError:
-    # Not a decimal number. Codename?
-    if version in codename_to_api_level_map:
-      return codename_to_api_level_map[version]
+    # Not a decimal number.
+    #
+    # It could be either a straight codename, e.g.
+    #     UpsideDownCake
+    #
+    # Or a codename with API fingerprint SHA, e.g.
+    #     UpsideDownCake.e7d3947f14eb9dc4fec25ff6c5f8563e
+    #
+    # Extract the codename and try and map it to a version number.
+    split = version.split(".")
+    codename = split[0]
+    if codename in codename_to_api_level_map:
+      return codename_to_api_level_map[codename]
     raise ExternalError(
-        "Unknown minSdkVersion: '{}'. Known codenames: {}".format(
-            version, codename_to_api_level_map))
+        "Unknown codename: '{}' from minSdkVersion: '{}'. Known codenames: {}".format(
+            codename, version, codename_to_api_level_map))
 
 
 def SignFile(input_name, output_name, key, password, min_api_level=None,
@@ -2685,8 +2695,6 @@ class PasswordManager(object):
               output = ps.communicate()[0]
               if ps.returncode == 0:
                 current[i] = output.decode('utf-8')
-              else:
-                logger.warning('Failed to get password for key "%s".', i)
             except Exception as e:
               print(e)
               pass
@@ -2694,6 +2702,8 @@ class PasswordManager(object):
             missing.append(i)
       # Are all the passwords already in the file?
       if not missing:
+        if "ANDROID_SECURE_STORAGE_CMD" in os.environ:
+          del os.environ["ANDROID_SECURE_STORAGE_CMD"]
         return current
 
       for i in missing:
@@ -3418,6 +3428,9 @@ class BlockDifference(object):
                 new_data_name=new_data_name, code=code))
     script.AppendExtra(script.WordWrap(call))
 
+    call = ('delete_recursive("/data/system/package_cache");')
+    script.AppendExtra(script.WordWrap(call))
+
   def _HashBlocks(self, source, ranges):  # pylint: disable=no-self-use
     data = source.ReadRangeSet(ranges)
     ctx = sha1()
@@ -3448,7 +3461,9 @@ PARTITION_TYPES = {
     "emmc": "EMMC",
     "f2fs": "EMMC",
     "squashfs": "EMMC",
-    "erofs": "EMMC"
+    "ext2": "EMMC",
+    "ext3": "EMMC",
+    "vfat": "EMMC"
 }
 
 
@@ -3593,23 +3608,8 @@ def MakeRecoveryPatch(input_dir, output_sink, recovery_img, boot_img,
     output_sink(recovery_img_path, recovery_img.data)
 
   else:
-    system_root_image = info_dict.get("system_root_image") == "true"
-    path = os.path.join(input_dir, recovery_resource_dat_path)
-    # With system-root-image, boot and recovery images will have mismatching
-    # entries (only recovery has the ramdisk entry) (Bug: 72731506). Use bsdiff
-    # to handle such a case.
-    if system_root_image:
-      diff_program = ["bsdiff"]
-      bonus_args = ""
-      assert not os.path.exists(path)
-    else:
-      diff_program = ["imgdiff"]
-      if os.path.exists(path):
-        diff_program.append("-b")
-        diff_program.append(path)
-        bonus_args = "--bonus /vendor/etc/recovery-resource.dat"
-      else:
-        bonus_args = ""
+    diff_program = ["bsdiff"]
+    bonus_args = ""
 
     d = Difference(recovery_img, boot_img, diff_program=diff_program)
     _, _, patch = d.ComputePatch()

@@ -270,6 +270,9 @@ _product_list_vars += PRODUCT_FORCE_PRODUCT_MODULES_TO_SYSTEM_PARTITION
 # This flag implies PRODUCT_USE_DYNAMIC_PARTITIONS.
 _product_single_value_vars += PRODUCT_RETROFIT_DYNAMIC_PARTITIONS
 
+# List of tags that will be used to gate blueprint modules from the build graph
+_product_list_vars += PRODUCT_INCLUDE_TAGS
+
 # When this is true, various build time as well as runtime debugfs restrictions are enabled.
 _product_single_value_vars += PRODUCT_SET_DEBUGFS_RESTRICTIONS
 
@@ -431,12 +434,15 @@ endef
 
 # Makes including non-existent modules in PRODUCT_PACKAGES an error.
 # $(1): list of non-existent modules to allow.
+define enforce-product-packages-exist-internal
+  $(eval PRODUCTS.$(1).PRODUCT_ENFORCE_PACKAGES_EXIST := true) \
+  $(eval PRODUCTS.$(1).PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST := $(2)) \
+  $(eval .KATI_READONLY := PRODUCTS.$(1).PRODUCT_ENFORCE_PACKAGES_EXIST) \
+  $(eval .KATI_READONLY := PRODUCTS.$(1).PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST)
+endef
 define enforce-product-packages-exist
   $(eval current_mk := $(strip $(word 1,$(_include_stack)))) \
-  $(eval PRODUCTS.$(current_mk).PRODUCT_ENFORCE_PACKAGES_EXIST := true) \
-  $(eval PRODUCTS.$(current_mk).PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST := $(1)) \
-  $(eval .KATI_READONLY := PRODUCTS.$(current_mk).PRODUCT_ENFORCE_PACKAGES_EXIST) \
-  $(eval .KATI_READONLY := PRODUCTS.$(current_mk).PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST)
+  $(enforce-product-packages-exist-internal,$(current_mk),$(1))
 endef
 
 #
