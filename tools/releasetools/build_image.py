@@ -578,8 +578,6 @@ def BuildImage(in_dir, prop_dict, out_file, target_out=None):
         logger.info(
             "Allocating %d Inodes for %s.", inodes, out_file)
       prop_dict["partition_size"] = str(size)
-      logger.info(
-          "Allocating %d Inodes for %s.", inodes, out_file)
     elif fs_type.startswith("f2fs") and prop_dict.get("f2fs_compress") == "true":
       prop_dict["partition_size"] = str(size)
       prop_dict["image_size"] = str(size)
