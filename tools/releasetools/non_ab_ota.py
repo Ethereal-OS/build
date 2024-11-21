@@ -214,23 +214,49 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   # Dump fingerprints
   script.Print("Target: {}".format(target_info.fingerprint))
 
-  date = target_info.GetBuildProp("ro.voltage.build.date")
-  version = target_info.GetBuildProp("ro.voltage.version")
+  android_version = target_info.GetBuildProp("ro.build.version.release")
+  build_id = target_info.GetBuildProp("ro.build.id")
+  build_date = target_info.GetBuildProp("ro.ethereal.build.date")
+  security_patch = target_info.GetBuildProp("ro.build.version.security_patch")
+  device = target_info.GetBuildProp("ro.product.device")
+  version = target_info.GetBuildProp("ro.ethereal.version")
 
   if target_info.GetBuildProp("ro.product.model") is not None:
     model = target_info.GetBuildProp("ro.product.model")
-    script.Print("***********************************************");
-    script.Print("           VOLTAGE-OS for %s"%(model));
-    script.Print("   Version: %s"%(version));
-    script.Print("   Compiled on: %s"%(date));
-    script.Print("***********************************************");
+      script.Print("|-----------------------------------------|");
+	script.Print("|,--. ,---. .  . ,--. ,-.  ,--.  ,.  ,    |");
+	script.Print("||      |   |  | |    |  ) |    /  \ |    |");
+	script.Print("||-     |   |--| |-   |-<  |-   |--| |    |");
+	script.Print("||      |   |  | |    |  \ |    |  | |    |");
+	script.Print("|`--'   '   '  ' `--' '  ' `--' '  ' `--' |");
+	script.Print("|      Your Destiny Brings You Here.      |");
+	script.Print("|               BY IamCOD3X               |");
+	script.Print("|-----------------------------------------|");
+	script.Print(" Android Version: %s"%(android_version));
+	script.Print(" Build Id:        %s"%(build_id));
+	script.Print(" Build Date:      %s"%(build_date));
+	script.Print(" Security Patch:  %s"%(security_patch));
+	script.Print(" Device:          %s"%(device));
+  script.Print(" Version:         %s"%(version));
+	script.Print("|------------------------------------------|");
   else:
     name = target_info.GetBuildProp("ro.product.name")
-    script.Print("***********************************************");
-    script.Print("           VOLTAGE-OS for %s"%(name));
-    script.Print("   Version: %s"%(version));
-    script.Print("   Compiled on: %s"%(date));
-    script.Print("***********************************************");
+      script.Print("|-----------------------------------------|");
+	script.Print("|,--. ,---. .  . ,--. ,-.  ,--.  ,.  ,    |");
+	script.Print("||      |   |  | |    |  ) |    /  \ |    |");
+	script.Print("||-     |   |--| |-   |-<  |-   |--| |    |");
+	script.Print("||      |   |  | |    |  \ |    |  | |    |");
+	script.Print("|`--'   '   '  ' `--' '  ' `--' '  ' `--' |");
+	script.Print("|      Your Destiny Brings You Here.      |");
+	script.Print("|               BY IamCOD3X               |");
+	script.Print("|-----------------------------------------|");
+	script.Print(" Android Version: %s"%(android_version));
+	script.Print(" Build Id:        %s"%(build_id));
+	script.Print(" Build Date:      %s"%(build_date));
+	script.Print(" Security Patch:  %s"%(security_patch));
+	script.Print(" Device:          %s"%(device));
+  script.Print(" Version:         %s"%(version));
+	script.Print("|------------------------------------------|");
 
   script.AppendExtra("ifelse(is_mounted(\"/system\"), unmount(\"/system\"));")
   device_specific.FullOTA_InstallBegin()

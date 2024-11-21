@@ -442,8 +442,8 @@ endif
 # See envsetup.mk for a description of SCAN_EXCLUDE_DIRS
 FIND_LEAVES_EXCLUDES := $(addprefix --prune=, $(SCAN_EXCLUDE_DIRS) .repo .git)
 
-ifneq ($(VOLTAGE_BUILD),)
-include vendor/voltage/config/BoardConfigVoltage.mk
+ifneq ($(ETHEREAL_BUILD),)
+include vendor/ethereal/config/BoardConfigEthereal.mk
 endif
 
 # The build system exposes several variables for where to find the kernel
@@ -1252,11 +1252,11 @@ BUILD_WARNING_BAD_OPTIONAL_USES_LIBS_ALLOWLIST := LegacyCamera Gallery2
 # in the source tree.
 dont_bother_goals := out product-graph
 
-ifneq ($(VOLTAGE_BUILD),)
-ifneq ($(wildcard device/voltage/sepolicy/common/sepolicy.mk),)
+ifneq ($(ETHEREAL_BUILD),)
+ifneq ($(wildcard device/ethereal/sepolicy/common/sepolicy.mk),)
 ## We need to be sure the global selinux policies are included
 ## last, to avoid accidental resetting by device configs
-$(eval include device/voltage/sepolicy/common/sepolicy.mk)
+$(eval include device/ethereal/sepolicy/common/sepolicy.mk)
 endif
 endif
 
