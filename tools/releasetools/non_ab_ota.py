@@ -239,8 +239,6 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.Print(" Device:          %s"%(device));
     script.Print(" Version:         %s"%(version));
     script.Print("|------------------------------------------|");
-    script.Print(" Version:         %s"%(version));
-    script.Print("|------------------------------------------|");
   else:
     name = target_info.GetBuildProp("ro.product.name")
     script.Print("|-----------------------------------------|");
